@@ -3,19 +3,16 @@ import json
 from openai import OpenAI
 import time
 
-# Настройка API (замени на свой ключ и базовый URL, если используешь z.ai или другой сервис)
-# Например, для Z.ai: base_url="https://api.z.ai/v1", api_key="твой_ключ"
 client = OpenAI(
-    api_key="YOUR_KEY_API", 
+    api_key="YOUR_KEY_API", #fc8bfc1a50cf41858bc8dfcf65bd67a5.AFNAQ3eviexxu6ej
     base_url="https://api.z.ai/api/paas/v4/"
 )
 
-# RSS лента (возьмем Коммерсантъ или Хабр для реальных новостей)
 RSS_URL = "https://habr.com/ru/rss/news/?fl=ru" 
 MOODS = ["optimistic", "sad", "ironic"]
 
 def rewrite_news(text, mood):
-    # Промпт - это ядро контроля фактов
+
     system_prompt = f"""
     Ты профессиональный редактор. Перепиши новость в следующем настроении: {mood}.
     КРИТИЧЕСКОЕ ПРАВИЛО: Ты обязан сохранить все факты на 100%. 
@@ -25,7 +22,7 @@ def rewrite_news(text, mood):
     
     try:
         response = client.chat.completions.create(
-            model="glm-4.7-flash", # <--- Изменили название модели на актуальное
+            model="glm-4.7-flash",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": text}
@@ -36,7 +33,7 @@ def rewrite_news(text, mood):
     except Exception as e:
         print(f"Ошибка API: {e}")
 
-        return text # Если ошибка, возвращаем оригинал
+        return text 
 
 def main():
     feed = feedparser.parse(RSS_URL)
@@ -47,10 +44,9 @@ def main():
     for entry in feed.entries[:10]:
         print(f"Обработка: {entry.title} ")
         
-        # Убираем HTML-теги из описания (упрощенно)
         original_text = entry.description.split('<')[0] 
         if len(original_text) < 20: 
-            original_text = entry.title # Если описание пустое, берем заголовок
+            original_text = entry.title 
             
         news_item = {
             "title": entry.title,
@@ -58,18 +54,17 @@ def main():
             "published": entry.published,
             "original_text": original_text,
             "moods": {
-                "neutral": original_text, # Нейтральный = оригинал
+                "neutral": original_text, 
             }
         }
         
         for mood in MOODS:
             print(f"  -> Генерация настроения: {mood}")
             news_item["moods"][mood] = rewrite_news(original_text, mood)
-            time.sleep(1) # Пауза, чтобы не словить лимиты API
+            time.sleep(1) 
             
         news_db.append(news_item)
         
-    # Сохраняем в "Базу данных" (JSON)
     with open("news_data.json", "w", encoding="utf-8") as f:
         json.dump(news_db, f, ensure_ascii=False, indent=4)
         
