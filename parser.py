@@ -6,7 +6,7 @@ import time
 # Настройка API (замени на свой ключ и базовый URL, если используешь z.ai или другой сервис)
 # Например, для Z.ai: base_url="https://api.z.ai/v1", api_key="твой_ключ"
 client = OpenAI(
-    api_key="fc8bfc1a50cf41858bc8dfcf65bd67a5.AFNAQ3eviexxu6ej", 
+    api_key="YOUR_KEY_API", 
     base_url="https://api.z.ai/api/paas/v4/"
 )
 
